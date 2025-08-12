@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Calculator</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8ffae 0%, #43c6ac 100%);
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .calculator {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(60,60,60,0.2);
+            padding: 30px;
+            width: 320px;
+            transition: box-shadow 0.3s;
+        }
+        .calculator:hover {
+            box-shadow: 0 16px 48px rgba(60,60,60,0.3);
+        }
+        .display {
+            height: 50px;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            text-align: right;
+            transition: background 0.3s;
+        }
+        .display:focus {
+            background: #e0e0e0;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        .btn {
+            padding: 18px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            background: #43c6ac;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .btn:hover {
+            background: #191654;
+            transform: scale(1.08);
+        }
+        .btn.operation {
+            background: #f8ffae;
+            color: #191654;
+        }
+        .btn.operation:hover {
+            background: #43c6ac;
+            color: #fff;
+        }
+        .btn.equal {
+            grid-column: span 4;
+            background: #191654;
+            color: #fff;
+        }
+        .btn.equal:hover {
+            background: #43c6ac;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <form th:action="@{/calculate}" method="post" id="calcForm">
+            <div class="display" id="display">
+                <span th:text="${num1}"></span>
+                <span th:text="${operation}"></span>
+                <span th:text="${num2}"></span>
+                <span th:if="${result != null}">= <span th:text="${result}"></span></span>
+            </div>
+            <input type="hidden" name="num1" id="num1" th:value="${num1}" />
+            <input type="hidden" name="num2" id="num2" th:value="${num2}" />
+            <input type="hidden" name="operation" id="operation" th:value="${operation}" />
+            <div class="buttons">
+                <button type="button" class="btn" onclick="appendNumber('7')">7</button>
+                <button type="button" class="btn" onclick="appendNumber('8')">8</button>
+                <button type="button" class="btn" onclick="appendNumber('9')">9</button>
+                <button type="button" class="btn operation" onclick="setOperation('/')">÷</button>
+                <button type="button" class="btn" onclick="appendNumber('4')">4</button>
+                <button type="button" class="btn" onclick="appendNumber('5')">5</button>
+                <button type="button" class="btn" onclick="appendNumber('6')">6</button>
+                <button type="button" class="btn operation" onclick="setOperation('*')">×</button>
+                <button type="button" class="btn" onclick="appendNumber('1')">1</button>
+                <button type="button" class="btn" onclick="appendNumber('2')">2</button>
+                <button type="button" class="btn" onclick="appendNumber('3')">3</button>
+                <button type="button" class="btn operation" onclick="setOperation('-')">−</button>
+                <button type="button" class="btn" onclick="appendNumber('0')">0</button>
+                <button type="button" class="btn" onclick="appendNumber('.')">.</button>
+                <button type="button" class="btn" onclick="clearDisplay()">C</button>
+                <button type="button" class="btn operation" onclick="setOperation('+')">+</button>
+                <button type="submit" class="btn equal">=</button>
+            </div>
+            <div class="error" th:if="${error}" th:text="${error}"></div>
+        </form>
+    </div>
+    <script>
+        let num1 = '';
+        let num2 = '';
+        let operation = '';
+        let isSecond = false;
+
+        function appendNumber(n) {
+            if (!isSecond) {
+                num1 += n;
+                document.getElementById('num1').value = num1;
+            } else {
+                num2 += n;
+                document.getElementById('num2').value = num2;
+            }
+            updateDisplay();
+        }
+
+        function setOperation(op) {
+            if (num1 === '') return;
+            operation = op;
+            document.getElementById('operation').value = operation;
+            isSecond = true;
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            num1 = '';
+            num2 = '';
+            operation = '';
+            isSecond = false;
+            document.getElementById('num1').value = '';
+            document.getElementById('num2').value = '';
+            document.getElementById('operation').value = '';
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('display').innerText = num1 + ' ' + operation + ' ' + num2;
+        }
+    </script>
+</body>
+</html>
